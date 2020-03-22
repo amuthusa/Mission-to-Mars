@@ -19,6 +19,7 @@ def scrape_all():
         "last_modified": dt.datetime.now()
     }
     browser.quit()
+    return data
 
 def mars_news (browser):
     #visit the mars nasa news site
@@ -59,7 +60,8 @@ def featured_image(browser):
 
     #find the more info button and click that
     browser.is_element_present_by_text('more_info', wait_time=1)
-    more_info_elem = browser.find_link_by_partial_text('more info')
+    #more_info_elem = browser.find_link_by_partial_text('more info')
+    more_info_elem = browser.links.find_by_partial_text('more info')
     more_info_elem.click()
 
     #parse the resulting html page
@@ -69,7 +71,6 @@ def featured_image(browser):
     try:
         #find relative image url
         img_url_rel = soup.select_one("figure.lede a img").get("src")
-        img_url_rel
 
         #create url using base and extracted image url
         img_url = f'https://www.jpl.nasa.gov{img_url_rel}'
@@ -88,6 +89,6 @@ def mars_facts():
         return None
 
 
-if __name__ == __main__:
+if __name__ == "__main__":
     #if running as script print the scraped data
     print (scrape_all())
