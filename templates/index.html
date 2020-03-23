@@ -38,10 +38,26 @@
                     <div class="row" id="mars-facts">
                        <div class="col-md-12">
                         <h4>Mars Facts</h4>
+                        <div class = "table-responsive">
                         {{ mars.facts | safe }}
+                        </div>
                        </div> 
                     </div>
                 </div>
+            </div>
+            <! Mars hemisphere -->
+            <div class="row" id="mars-hemisphere-image">
+                <h4>Mars hemisphere snapshot</h4>
+                {% 
+                    for hemisphere in hem.all_hemispheres:
+                %}
+                    <div class="col-md-3">
+                        <figure class="figure">
+                            <img src="{{hemisphere.image_url}}" class="img-fluid img-thumbnail" alt="thumbnail"/>
+                            <figcaption class="figure-caption">{{hemisphere.title}}</figcaption>
+                        </figure>
+                    </div>
+                {%  endfor %}
             </div>
         </div>
     </div>

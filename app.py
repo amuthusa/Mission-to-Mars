@@ -13,14 +13,20 @@ mongo = PyMongo(app)
 @app.route("/")
 def index():
     mars = mongo.db.mars.find_one()
-    return render_template("index.html", mars=mars)
+    hemisphere = mongo.db.hemisphere.find_one()
+    return render_template("index.html", mars=mars, hem=hemisphere)
+
 
 @app.route("/Scrape")
 def scrape():
     mars = mongo.db.mars
     mars_data = Scraping.scrape_all()
-    mars.update({}, mars_data, upsert=True)
-    #mars.insert(mars_data)
+    document_id = mars.update({}, mars_data, upsert=True)
+    print(f"updated document id: {document_id}")
+    hemisphere = mongo.db.hemisphere
+    hemisphere_data = Scraping.scrape_allhemispheres()
+    print(f"all hemispheres data: {hemisphere_data}")
+    hemisphere.update({}, hemisphere_data, upsert=True)
     return "Scraping successful!"
 
 if __name__ == "__main__":

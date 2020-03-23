@@ -21,6 +21,16 @@ def scrape_all():
     browser.quit()
     return data
 
+def scrape_allhemispheres():
+    executable_path = {'executable_path' : '/usr/local/bin/chromedriver'}
+    browser = Browser('chrome', **executable_path, headless=True)
+    all_hemispheres = mars_hemisphere(browser)
+    data = {
+        'all_hemispheres': all_hemispheres
+    }
+    browser.quit()
+    return data
+
 def mars_news (browser):
     #visit the mars nasa news site
     url = 'https://mars.nasa.gov/news/'
@@ -88,7 +98,49 @@ def mars_facts():
     except BaseException:
         return None
 
+def mars_hemisphere(browser):
+    mars_hemisphere_base_url = 'https://astrogeology.usgs.gov'
+    mars_hemispheres_url = f"{mars_hemisphere_base_url}/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    browser.visit(mars_hemispheres_url)
+
+    #parse the html to get the image and title
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
+
+    try:
+        #find all div tag with class item which contains the mars hemispheres details
+        items = soup.find_all("div", class_="item")
+        hemispheres = []
+        for item in items:
+            #get link by finding item link with div class description and anchor with itemLink
+            item_link = item.select_one("div.description a.itemLink")
+            #print(f'item link: {item_link}')
+            title = item_link.get_text()
+            link = f"{mars_hemisphere_base_url}{item_link.get('href')}"
+            hemispheres.append({'title' : title , 'link': link})
+
+        for hemisphere in hemispheres:
+            image_url = mars_hemisphere_fullimage(browser, hemisphere.pop('link'))  
+            hemisphere['image_url'] = image_url;
+
+        return hemispheres
+    except BaseException:
+        return None
+
+def mars_hemisphere_fullimage(browser, url) :
+    browser.visit(url)
+    #parse the html to get the image and title
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
+    browser.is_element_present_by_text('Download', wait_time=5)
+    try :
+        downloads = soup.find("div", "downloads");
+        link = downloads.select_one("ul li a")
+        return link.get('href')
+    except BaseException:
+        return None
 
 if __name__ == "__main__":
     #if running as script print the scraped data
-    print (scrape_all())
+    #print (scrape_all())
+    print (scrape_allhemispheres())
